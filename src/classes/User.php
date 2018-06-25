@@ -61,4 +61,17 @@ class User{
             return false;
         }
     }
+
+    public function getUserByUsername($username){
+        $stmt = $this->db->prepare('SELECT id,password FROM users WHERE username = :username');
+        $stmt->bindValue(':username',$username);
+        $stmt->execute();
+        $user = $stmt->fetch();
+        if(!$user){
+            return false;
+        }
+        return $user;
+    }
+
+
 }

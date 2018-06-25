@@ -22,5 +22,6 @@ $app->get('/', function (Request $request, Response $response, array $args) {
 });
 
 require '../routes/users.routes.php';
+require '../routes/threads.routes.php';
 
 $app->run();

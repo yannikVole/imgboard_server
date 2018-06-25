@@ -14,6 +14,7 @@ $app->get('/users/{id}', function(Request $req,Response $res, $args){
     $mapper = new User($this->db);
     $user = $mapper->getUserById($user_id);
     $res->getBody()->write(json_encode($user));
+    return $res;
 });
 
 $app->delete('/users/{id}', function(Request $req,Response $res, $args){
@@ -29,6 +30,7 @@ $app->delete('/users/{id}', function(Request $req,Response $res, $args){
     }
 
     $res->getBody()->write('{msg:'.$msg.'}');
+    return $res;
 });
 
 $app->post('/users', function(Request $req, Response $res){
@@ -49,6 +51,7 @@ $app->post('/users', function(Request $req, Response $res){
     }
 
     $res->getBody()->write('{msg:'.$msg.'}');
+    return $res;
 });
 
 $app->put('/users/{id}', function(Request $req, Response $res, $args){
@@ -71,8 +74,30 @@ $app->put('/users/{id}', function(Request $req, Response $res, $args){
     }
 
     $res->getBody()->write('{"msg":"'.$msg.'"}');
+    return $res;
 });
 
 $app->post('/users/login', function(Request $req, Response $res){
-    //TODO: login stuff
+    $data = $req->getParsedBody();
+    $mapper = new User($this->db);
+
+    $user = $mapper->getUserByUsername($data['username']);
+    
+    if(password_verify($data['password'],$user->password)){
+        $jwt = Authorizer::getToken($user);
+        $res->getBody()->write(json_encode(array(
+            'code' => 200,
+            'status' => 'success',
+            'message' => 'valid login credentials',
+            'user_id' => $user->id,
+            'jwt' => $jwt
+        )));
+    }else{
+        $res->getBody()->write(json_encode(array(
+            'code' => 666,
+            'status' => 'error',
+            'message' => 'INVALID LOGIN CREDENTIALS'
+        )));
+    }
 });
+
