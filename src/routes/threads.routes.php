@@ -9,7 +9,7 @@ $app->get('/threads', function(Request $req, Response $res){
 
     $res->getBody()->write(json_encode($threads));
     return $res;
-});
+})->add($authenticate);
 
 $app->get('/threads/{id}', function(Request $req, Response $res, $args){
     $mapper = new pThread($this->db);
@@ -18,7 +18,7 @@ $app->get('/threads/{id}', function(Request $req, Response $res, $args){
 
     $res->getBody()->write(json_encode($thread));
     return $res;
-});
+})->add($authenticate);
 
 $app->post('/threads', function(Request $req, Response $res){
     $data = $req->getParsedBody();
@@ -37,7 +37,7 @@ $app->post('/threads', function(Request $req, Response $res){
 
     $res->getBody()->write('{msg:'.$msg.'}');
     return $res;
-});
+})->add($authenticate);
 
 $app->put('/threads/{id}', function(Request $req, Response $res, $args){
     $data = $req->getParsedBody();
@@ -56,7 +56,7 @@ $app->put('/threads/{id}', function(Request $req, Response $res, $args){
 
     $res->getBody()->write('{msg:'.$msg.'}');
     return $res;
-});
+})->add($authenticate);
 
 $app->delete('/threads/{id}', function(Request $req, Response $res, $args){
     $id = $args['id'];
@@ -71,4 +71,4 @@ $app->delete('/threads/{id}', function(Request $req, Response $res, $args){
 
     $res->getBody()->write(json_encode($thread));
     return $res;
-});
+})->add($authenticate);

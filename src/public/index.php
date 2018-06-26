@@ -5,6 +5,9 @@ use \Psr\Http\Message\ResponseInterface as Response;
 require '../vendor/autoload.php';
 require '../config/config.php';
 
+$dotenv = new Dotenv\Dotenv(__DIR__);
+$dotenv->load();
+
 
 $app = new \Slim\App(['settings' => $config]);
 $container = $app->getContainer();
@@ -16,6 +19,8 @@ $container['db'] = function ($c) {
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
     return $pdo;
 };
+
+require '../middleware/authenticate.php';
 
 $app->get('/', function (Request $request, Response $response, array $args) {
     echo 'imgboard server =)';

@@ -3,7 +3,6 @@ use \Firebase\JWT\JWT;
 
 class Authorizer{
 
-    public static $SECRET_KEY = 'dakommtihrniedrauf';
 
     public static function getToken($user){
         $issuedAt = time();
@@ -13,8 +12,8 @@ class Authorizer{
             'iat' => $issuedAt,
             'exp' => $expirationTime
         ];
-        $key = self::$SECRET_KEY;
-        $alg = 'HS256';
+        $key = base64_decode(getenv('JWT_SECRET'));
+        $alg = getenv('ALGORITHM');
         $jwt = JWT::encode($payload,$key,$alg);
         return $jwt;
     }
@@ -23,7 +22,7 @@ class Authorizer{
         if(isset($_POST['jwt'])){
             
             try{
-                $decoded = JWT::decode($_POST['jwt'],self::$SECRET_KEY,['HS256']);
+                $decoded = JWT::decode($_POST['jwt'],base64_decode(getenv('JWT_SECRET')),getenv('ALGORITHM'));
                 return (array)$decoded;
 
             } catch(\Exception $e){

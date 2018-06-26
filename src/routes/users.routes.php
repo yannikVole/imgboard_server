@@ -7,7 +7,7 @@ $app->get('/users', function (Request $request, Response $response) {
     $users = $mapper->getUsers();
     $response->getBody()->write(json_encode($users));
     return $response;
-});
+})->add($authenticate);
 
 $app->get('/users/{id}', function(Request $req,Response $res, $args){
     $user_id = (int)$args['id'];
@@ -15,7 +15,7 @@ $app->get('/users/{id}', function(Request $req,Response $res, $args){
     $user = $mapper->getUserById($user_id);
     $res->getBody()->write(json_encode($user));
     return $res;
-});
+})->add($authenticate);
 
 $app->delete('/users/{id}', function(Request $req,Response $res, $args){
     $user_id = (int)$args['id'];
@@ -31,7 +31,7 @@ $app->delete('/users/{id}', function(Request $req,Response $res, $args){
 
     $res->getBody()->write('{msg:'.$msg.'}');
     return $res;
-});
+})->add($authenticate);
 
 $app->post('/users', function(Request $req, Response $res){
     $data = $req->getParsedBody();
@@ -75,7 +75,7 @@ $app->put('/users/{id}', function(Request $req, Response $res, $args){
 
     $res->getBody()->write('{"msg":"'.$msg.'"}');
     return $res;
-});
+})->add($authenticate);
 
 $app->post('/users/login', function(Request $req, Response $res){
     $data = $req->getParsedBody();
