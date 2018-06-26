@@ -62,6 +62,17 @@ class Thread{
         return true;
     }
 
+    public function getThreadsByUserId($user_id){
+        $stmt = $this->db->prepare('SELECT * FROM threads WHERE user_id = :user_id');
+        $stmt->bindValue(':user_id',$user_id);
+
+        if(!$stmt->execute()){
+            return false;
+        }
+        $threads = $stmt->fetchAll();
+        return $threads;
+    }
+
 
 
     

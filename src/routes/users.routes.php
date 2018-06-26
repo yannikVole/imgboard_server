@@ -1,6 +1,7 @@
 <?php
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
+use \imgb\Thread as pThread;
 
 $app->get('/users', function (Request $request, Response $response) {
     $mapper = new User($this->db);
@@ -34,15 +35,19 @@ $app->delete('/users/{id}', function(Request $req,Response $res, $args){
 })->add($authenticate);
 
 $app->post('/users', function(Request $req, Response $res){
+    $mapper = new User($this->db);
     $data = $req->getParsedBody();
     $user = [];
     $user['username'] = filter_var($data['username'], FILTER_SANITIZE_STRING);
+
+    if($mapper->getUserByUsername($user['username'])){
+        return $res->withStatus(409)->write('username allready taken');
+    }
+
     $user['email'] = filter_var($data['email'], FILTER_SANITIZE_STRING);
-    
     $password = filter_var($data['password'], FILTER_SANITIZE_STRING);
     $user['password'] = password_hash($password,PASSWORD_BCRYPT);
 
-    $mapper = new User($this->db);
     $msg = '';
     if($mapper->addNewUser($user)){
         $msg = 'success';
@@ -100,4 +105,16 @@ $app->post('/users/login', function(Request $req, Response $res){
         )));
     }
 });
+
+$app->get('/users/{id}/threads', function(Request $req,Response $res, $args){
+    $user_id = (int)$args['id'];
+    $mapper = new pThread($this->db);
+    $threads = $mapper->getThreadsByUserId($user_id);
+
+    if($threads){
+        return $res->getBody()->write(json_encode($threads));
+    } else {
+        $res->getBody()->write('{msg:error}');
+    }
+})->add($authenticate);
 
