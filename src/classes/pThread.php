@@ -1,7 +1,6 @@
 <?php
-namespace imgb;
 
-class Thread{
+class pThread{
     private $db;
 
     public function __construct($newDB){
@@ -14,16 +13,23 @@ class Thread{
             return false;
         }
         $threads = $stmt->fetchAll();
+
+        foreach($threads as $thread){
+            $thread->comments = $this->populateComments($thread->id);
+        }
         
         return $threads;
     }
 
     public function getThreadById($id){
         $stmt = $this->db->prepare("SELECT * FROM threads WHERE id = :id");
+        $stmt->bindValue(':id',$id);
         if(!$stmt->execute()){
             return false;
         }
         $thread = $stmt->fetch();
+
+        $thread->comments = $this->populateComments($thread->id);
 
         return $thread;
     }
@@ -72,6 +78,32 @@ class Thread{
         $threads = $stmt->fetchAll();
         return $threads;
     }
+
+    public function addCommentToThread($threadId,$comment){
+        $stmt = $this->db->prepare('INSERT INTO comments (thread_id,body) VALUES(:thread_id, :body)');
+        $stmt->bindValue(':thread_id', $threadId);
+        $stmt->bindValue(':body',$comment);
+
+        if(!$stmt->execute()){
+            return false;
+        }
+        return true;
+    }
+
+    private function populateComments($id){
+        $stmt = $this->db->prepare('SELECT * FROM comments WHERE thread_id = :thread_id');
+        $stmt->bindValue(':thread_id',$id);
+
+        $stmt->execute();
+        $comments = $stmt->fetchAll();
+        if($comments){
+            return $comments;
+        } else {
+            return false;
+        }
+    }
+
+    
 
 
 

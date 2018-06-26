@@ -1,6 +1,11 @@
 # imgboard_server
 ----------
-## Users
+Backend to my Imgboard Project: [Imgboard Angular](https://github.com/yannikVole/angular_imgboard)
+
+
+## Routes
+----------
+### Users
 ```
  - /users [GET] get all
  - /users [POST] add new
@@ -9,12 +14,14 @@
  - /users/{id} [DELETE] delete one by id
  - /users/{id}/threads [GET] get threads by user_id
 ```
+----------
 
-## Threads
+### Threads
 ```
  - /threads [GET]
  - /threads [POST]
  - /threads/{id} [GET]
  - /threads/{id} [PUT]
  - /threads/{id} [DELETE]
+ - /threads/{id}/comments [POST]
 ```

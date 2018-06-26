@@ -1,21 +1,46 @@
 <?php
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
-use \imgb\Thread as pThread;
 
 $app->get('/users', function (Request $request, Response $response) {
     $mapper = new User($this->db);
     $users = $mapper->getUsers();
-    $response->getBody()->write(json_encode($users));
-    return $response;
+
+    if($users){
+        $msg = 'success';
+        $code = 200;
+    } else {
+        $msg = 'error';
+        $code = 409;
+    }
+
+    $result = [
+        'msg' => $msg,
+        'status' => $code,
+        'payload' => $users
+    ];
+    $res->withStatus($code)->write(json_encode($result));
 })->add($authenticate);
 
 $app->get('/users/{id}', function(Request $req,Response $res, $args){
     $user_id = (int)$args['id'];
     $mapper = new User($this->db);
     $user = $mapper->getUserById($user_id);
-    $res->getBody()->write(json_encode($user));
-    return $res;
+    
+    if($user){
+        $msg = 'success';
+        $code = 200;
+    } else {
+        $msg = 'error';
+        $code = 409;
+    }
+
+    $result = [
+        'msg' => $msg,
+        'status' => $code,
+        'payload' => $user
+    ];
+    $res->withStatus($code)->write(json_encode($result));
 })->add($authenticate);
 
 $app->delete('/users/{id}', function(Request $req,Response $res, $args){
@@ -26,12 +51,17 @@ $app->delete('/users/{id}', function(Request $req,Response $res, $args){
     $msg = '';
     if($mapper->deleteUserById($user)){
         $msg = 'success';
+        $code = 200;
     } else {
         $msg = 'error';
+        $code = 409;
     }
 
-    $res->getBody()->write('{msg:'.$msg.'}');
-    return $res;
+    $result = [
+        'msg' => $msg,
+        'status' => $code
+    ];
+    $res->withStatus($code)->write(json_encode($result));
 })->add($authenticate);
 
 $app->post('/users', function(Request $req, Response $res){
@@ -51,12 +81,17 @@ $app->post('/users', function(Request $req, Response $res){
     $msg = '';
     if($mapper->addNewUser($user)){
         $msg = 'success';
+        $code = 200;
     } else {
         $msg = 'error';
+        $code = 409;
     }
 
-    $res->getBody()->write('{msg:'.$msg.'}');
-    return $res;
+    $result = [
+        'msg' => $msg,
+        'status' => $code
+    ];
+    $res->withStatus($code)->write(json_encode($result));
 });
 
 $app->put('/users/{id}', function(Request $req, Response $res, $args){
@@ -71,15 +106,19 @@ $app->put('/users/{id}', function(Request $req, Response $res, $args){
     $user['password'] = password_hash($password,PASSWORD_BCRYPT);
 
     $mapper = new User($this->db);
-    $msg = '';
     if($mapper->updateUserById($user,$user_id)){
         $msg = 'success';
+        $code = 200;
     } else {
         $msg = 'error';
+        $code = 409;
     }
 
-    $res->getBody()->write('{"msg":"'.$msg.'"}');
-    return $res;
+    $result = [
+        'msg' => $msg,
+        'status' => $code
+    ];
+    $res->withStatus($code)->write(json_encode($result));
 })->add($authenticate);
 
 $app->post('/users/login', function(Request $req, Response $res){
@@ -106,15 +145,16 @@ $app->post('/users/login', function(Request $req, Response $res){
     }
 });
 
+//move to new file?
 $app->get('/users/{id}/threads', function(Request $req,Response $res, $args){
     $user_id = (int)$args['id'];
     $mapper = new pThread($this->db);
     $threads = $mapper->getThreadsByUserId($user_id);
 
     if($threads){
-        return $res->getBody()->write(json_encode($threads));
+        return $res->write(json_encode($threads));
     } else {
-        $res->getBody()->write('{msg:error}');
+        $res->write('{msg:error}');
     }
 })->add($authenticate);
 

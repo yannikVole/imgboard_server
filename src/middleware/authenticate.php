@@ -19,7 +19,7 @@ $authenticate = function(Request $request, Response $response,$next){
 
             return $response;
         } catch(\Exception $e){
-            return $response->withStatus(401)->write('Unauthorized. Invalid Token!');
+            return $response->withStatus(401)->write('Unauthorized. Invalid Token!'.$e);
         }
     } else {
         return $response->withStatus(401)->write('Unauthorized. Invalid Token');
